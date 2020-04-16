@@ -41,6 +41,7 @@ type (
 		Network        string        `json:"network,omitempty"`
 		Addr           string        `json:"addr,omitempty"`
 		Reused         bool          `json:"reused,omitempty"`
+		TCPReused      bool          `json:"tcpReused,omitempty"`
 		WasIdle        bool          `json:"wasIdle,omitempty"`
 		IdleTime       time.Duration `json:"idleTime,omitempty"`
 		Protocol       string        `json:"protocol,omitempty"`
@@ -179,6 +180,7 @@ func NewClientTrace() (trace *httptrace.ClientTrace, ht *HTTPTrace) {
 		ConnectStart: func(network, addr string) {
 			ht.Lock()
 			defer ht.Unlock()
+			ht.TCPReused = false
 			ht.Network = network
 			ht.Addr = addr
 			ht.ConnectStart = time.Now()
