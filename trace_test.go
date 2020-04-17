@@ -30,6 +30,7 @@ func TestTrace(t *testing.T) {
 		Host: "aslant.site",
 	})
 	time.Sleep(time.Millisecond)
+	assert.True(ht.TCPReused)
 
 	addrs := make([]net.IPAddr, 0)
 	addrs = append(addrs, net.IPAddr{
@@ -42,6 +43,7 @@ func TestTrace(t *testing.T) {
 
 	trace.ConnectStart("tcp", "1.1.1.1")
 	time.Sleep(time.Millisecond)
+	assert.False(ht.TCPReused)
 
 	trace.ConnectDone("", "", nil)
 	time.Sleep(time.Millisecond)

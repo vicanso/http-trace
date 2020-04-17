@@ -160,6 +160,8 @@ func (ht *HTTPTrace) Stats() (stats *HTTPTimelineStats) {
 func NewClientTrace() (trace *httptrace.ClientTrace, ht *HTTPTrace) {
 	ht = &HTTPTrace{
 		Start: time.Now(),
+		// will be false when connect start event
+		TCPReused: true,
 	}
 	trace = &httptrace.ClientTrace{
 		DNSStart: func(info nht.DNSStartInfo) {
