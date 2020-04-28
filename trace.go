@@ -32,22 +32,30 @@ type (
 		ContentTransfer  time.Duration `json:"contentTransfer,omitempty"`
 		Total            time.Duration `json:"total,omitempty"`
 	}
+
+	tlsCertificate struct {
+		DNSNames  []string  `json:"dnsNames,omitempty"`
+		NotBefore time.Time `json:"notBefore,omitempty"`
+		NotAfter  time.Time `json:"notAfter,omitempty"`
+	}
+
 	// HTTPTrace http trace
 	HTTPTrace struct {
 		// 因为timeout的设置有可能导致 trace 读写并存，因此需要锁
 		sync.RWMutex
-		Host           string        `json:"host,omitempty"`
-		Addrs          []string      `json:"addrs,omitempty"`
-		Network        string        `json:"network,omitempty"`
-		Addr           string        `json:"addr,omitempty"`
-		Reused         bool          `json:"reused,omitempty"`
-		TCPReused      bool          `json:"tcpReused,omitempty"`
-		WasIdle        bool          `json:"wasIdle,omitempty"`
-		IdleTime       time.Duration `json:"idleTime,omitempty"`
-		Protocol       string        `json:"protocol,omitempty"`
-		TLSVersion     string        `json:"tlsVersion,omitempty"`
-		TLSResume      bool          `json:"tlsResume,omitempty"`
-		TLSCipherSuite string        `json:"tlsCipherSuite,omitempty"`
+		Host           string           `json:"host,omitempty"`
+		Addrs          []string         `json:"addrs,omitempty"`
+		Network        string           `json:"network,omitempty"`
+		Addr           string           `json:"addr,omitempty"`
+		Reused         bool             `json:"reused,omitempty"`
+		TCPReused      bool             `json:"tcpReused,omitempty"`
+		WasIdle        bool             `json:"wasIdle,omitempty"`
+		IdleTime       time.Duration    `json:"idleTime,omitempty"`
+		Protocol       string           `json:"protocol,omitempty"`
+		TLSVersion     string           `json:"tlsVersion,omitempty"`
+		TLSResume      bool             `json:"tlsResume,omitempty"`
+		TLSCipherSuite string           `json:"tlsCipherSuite,omitempty"`
+		Certificates   []tlsCertificate `json:"certificates,omitempty"`
 
 		Start                time.Time `json:"start,omitempty"`
 		DNSStart             time.Time `json:"dnsStart,omitempty"`
@@ -73,7 +81,6 @@ const (
 
 func init() {
 	versions = map[uint16]string{
-		tls.VersionSSL30: "ssl3.0",
 		tls.VersionTLS10: "tls1.0",
 		tls.VersionTLS11: "tls1.1",
 		tls.VersionTLS12: "tls1.2",
@@ -214,6 +221,16 @@ func NewClientTrace() (trace *httptrace.ClientTrace, ht *HTTPTrace) {
 		TLSHandshakeDone: func(info tls.ConnectionState, _ error) {
 			ht.Lock()
 			defer ht.Unlock()
+			ht.Certificates = make([]tlsCertificate, 0)
+			for _, item := range info.PeerCertificates {
+				if len(item.DNSNames) != 0 {
+					ht.Certificates = append(ht.Certificates, tlsCertificate{
+						DNSNames:  item.DNSNames,
+						NotBefore: item.NotBefore,
+						NotAfter:  item.NotAfter,
+					})
+				}
+			}
 			ht.TLSVersion = convertTLSVersion(info.Version)
 			ht.TLSResume = info.DidResume
 			ht.TLSCipherSuite = convertCipherSuite(info.CipherSuite)

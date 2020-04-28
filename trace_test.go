@@ -12,7 +12,7 @@ import (
 
 func TestConvertTLSVersion(t *testing.T) {
 	assert := assert.New(t)
-	assert.Equal("ssl3.0", convertTLSVersion(tls.VersionSSL30))
+	assert.Equal("tls1.0", convertTLSVersion(tls.VersionTLS10))
 	assert.Equal(unknown, convertTLSVersion(1))
 }
 
