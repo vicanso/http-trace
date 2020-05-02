@@ -13,13 +13,13 @@ import (
 func TestConvertTLSVersion(t *testing.T) {
 	assert := assert.New(t)
 	assert.Equal("tls1.0", convertTLSVersion(tls.VersionTLS10))
-	assert.Equal(unknown, convertTLSVersion(1))
+	assert.Equal("1", convertTLSVersion(1))
 }
 
 func TestConvertCipherSuite(t *testing.T) {
 	assert := assert.New(t)
-	assert.Equal("ECDHE_RSA_WITH_AES_128_CBC_SHA", convertCipherSuite(tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA))
-	assert.Equal(unknown, convertCipherSuite(1))
+	assert.Equal("TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA", convertCipherSuite(tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA))
+	assert.Equal("1", convertCipherSuite(1))
 }
 
 func TestTrace(t *testing.T) {
