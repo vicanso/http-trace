@@ -6,6 +6,17 @@
 HTTP Request trace, timing and requset's informations. 
 Timing include `dns`, `connect`, `tls`, `first reponse byte` and so on.
 
+events:
+- GetConn
+- DNSStart
+- DNSDone
+- ConnectStart
+- ConnectDone
+- TLSHandshakeStart
+- TLSHandshakeDone
+- GotConn
+- GotFirstResponseByte
+
 ```go
 trace, ht := NewClientTrace()
 ctx := context.Background()

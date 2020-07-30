@@ -26,6 +26,9 @@ func TestTrace(t *testing.T) {
 	assert := assert.New(t)
 	trace, ht := NewClientTrace()
 
+	trace.GetConn("1.1.1.1:80")
+	time.Sleep(time.Millisecond)
+
 	trace.DNSStart(nht.DNSStartInfo{
 		Host: "aslant.site",
 	})
@@ -65,6 +68,7 @@ func TestTrace(t *testing.T) {
 	ht.Finish()
 
 	stats := ht.Stats()
+	assert.NotEqual(0, stats.GetConnection)
 	assert.NotEqual(0, stats.DNSLookup)
 	assert.NotEqual(0, stats.TCPConnection)
 	assert.NotEqual(0, stats.TLSHandshake)
