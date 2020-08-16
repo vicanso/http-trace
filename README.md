@@ -23,7 +23,7 @@ ctx := context.Background()
 ctx = httptrace.WithClientTrace(ctx, trace)
 req, _ := http.NewRequest("GET", "https://www.baidu.com/", nil)
 
-req.WithContext(ctx)
+req = req.WithContext(ctx)
 resp, _ := http.DefaultClient.Do(req)
 
 ht.Finish()
