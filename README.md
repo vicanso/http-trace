@@ -15,6 +15,7 @@ events:
 - TLSHandshakeStart
 - TLSHandshakeDone
 - GotConn
+- WroteHeaders
 - GotFirstResponseByte
 
 ```go

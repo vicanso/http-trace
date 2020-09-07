@@ -42,12 +42,13 @@ type (
 
 	// HTTPTrace http trace
 	HTTPTrace struct {
+		// Host request host
 		Host           string           `json:"host,omitempty"`
 		Addrs          []string         `json:"addrs,omitempty"`
 		Network        string           `json:"network,omitempty"`
 		Addr           string           `json:"addr,omitempty"`
+		LocalAddr      string           `json:"localAddr,omitempty"`
 		Reused         bool             `json:"reused,omitempty"`
-		TCPReused      bool             `json:"tcpReused,omitempty"`
 		WasIdle        bool             `json:"wasIdle,omitempty"`
 		IdleTime       time.Duration    `json:"idleTime,omitempty"`
 		Protocol       string           `json:"protocol,omitempty"`
@@ -63,6 +64,7 @@ type (
 		ConnectStart         time.Time `json:"connectStart,omitempty"`
 		ConnectDone          time.Time `json:"connectDone,omitempty"`
 		GotConnect           time.Time `json:"gotConnect,omitempty"`
+		WroteHeaders         time.Time `json:"wroteHeaders,omitempty"`
 		GotFirstResponseByte time.Time `json:"gotFirstResponseByte,omitempty"`
 		TLSHandshakeStart    time.Time `json:"tlsHandshakeStart,omitempty"`
 		TLSHandshakeDone     time.Time `json:"tlsHandshakeDone,omitempty"`
@@ -120,16 +122,16 @@ func init() {
 }
 
 func convertTLSVersion(version uint16) string {
-	v := versions[version]
-	if v == "" {
+	v, ok := versions[version]
+	if !ok {
 		v = strconv.Itoa(int(version))
 	}
 	return v
 }
 
 func convertCipherSuite(cipherSuite uint16) string {
-	v := cipherSuites[cipherSuite]
-	if v == "" {
+	v, ok := cipherSuites[cipherSuite]
+	if !ok {
 		v = strconv.Itoa(int(cipherSuite))
 	}
 	return v
@@ -173,8 +175,6 @@ func (ht *HTTPTrace) Stats() (stats *HTTPTimelineStats) {
 func NewClientTrace() (trace *httptrace.ClientTrace, ht *HTTPTrace) {
 	ht = &HTTPTrace{
 		Start: time.Now(),
-		// will be false when connect start event
-		TCPReused: true,
 	}
 	trace = &httptrace.ClientTrace{
 		DNSStart: func(info nht.DNSStartInfo) {
@@ -188,10 +188,7 @@ func NewClientTrace() (trace *httptrace.ClientTrace, ht *HTTPTrace) {
 			}
 			ht.DNSDone = time.Now()
 		},
-		ConnectStart: func(network, addr string) {
-			ht.TCPReused = false
-			ht.Network = network
-			ht.Addr = addr
+		ConnectStart: func(_, _ string) {
 			ht.ConnectStart = time.Now()
 		},
 		ConnectDone: func(_, _ string, _ error) {
@@ -201,11 +198,21 @@ func NewClientTrace() (trace *httptrace.ClientTrace, ht *HTTPTrace) {
 			ht.GetConn = time.Now()
 		},
 		GotConn: func(info nht.GotConnInfo) {
+			if info.Conn != nil {
+				remoteAddr := info.Conn.RemoteAddr()
+				ht.Network = remoteAddr.Network()
+				ht.Addr = remoteAddr.String()
+				ht.LocalAddr = info.Conn.LocalAddr().String()
+			}
+
 			ht.Reused = info.Reused
 			ht.WasIdle = info.WasIdle
 			ht.IdleTime = info.IdleTime
 
 			ht.GotConnect = time.Now()
+		},
+		WroteHeaders: func() {
+			ht.WroteHeaders = time.Now()
 		},
 		GotFirstResponseByte: func() {
 			ht.GotFirstResponseByte = time.Now()
