@@ -56,6 +56,8 @@ type (
 		TLSResume      bool             `json:"tlsResume,omitempty"`
 		TLSCipherSuite string           `json:"tlsCipherSuite,omitempty"`
 		Certificates   []tlsCertificate `json:"certificates,omitempty"`
+		// OCSPStapled OCSP stapling
+		OCSPStapled bool `json:"ocspStapled,omitempty"`
 
 		Start                time.Time `json:"start,omitempty"`
 		GetConn              time.Time `json:"getConn,omitempty"`
@@ -222,6 +224,7 @@ func NewClientTrace() (trace *httptrace.ClientTrace, ht *HTTPTrace) {
 		},
 		TLSHandshakeDone: func(info tls.ConnectionState, _ error) {
 			ht.Certificates = make([]tlsCertificate, 0)
+			ht.OCSPStapled = len(info.OCSPResponse) != 0
 			for _, item := range info.PeerCertificates {
 				if len(item.DNSNames) != 0 {
 					ht.Certificates = append(ht.Certificates, tlsCertificate{
