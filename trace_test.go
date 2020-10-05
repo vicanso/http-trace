@@ -73,4 +73,6 @@ func TestTrace(t *testing.T) {
 	assert.NotEqual(0, stats.ServerProcessing)
 	assert.NotEqual(0, stats.ContentTransfer)
 	assert.NotEqual(0, stats.Total)
+
+	assert.NotEmpty(stats.String())
 }

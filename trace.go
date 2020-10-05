@@ -16,9 +16,11 @@ package httptrace
 
 import (
 	"crypto/tls"
+	"fmt"
 	"net/http/httptrace"
 	nht "net/http/httptrace"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -137,6 +139,19 @@ func convertCipherSuite(cipherSuite uint16) string {
 		v = strconv.Itoa(int(cipherSuite))
 	}
 	return v
+}
+
+// String http timeline stats to string
+func (stats *HTTPTimelineStats) String() string {
+	sb := strings.Builder{}
+	sb.WriteString(fmt.Sprintf("%s(%s), ", stats.DNSLookup.String(), "dns lookup"))
+	sb.WriteString(fmt.Sprintf("%s(%s), ", stats.GetConnection.String(), "get connection"))
+	sb.WriteString(fmt.Sprintf("%s(%s), ", stats.TCPConnection.String(), "tcp connection"))
+	sb.WriteString(fmt.Sprintf("%s(%s), ", stats.TLSHandshake.String(), "tls handshake"))
+	sb.WriteString(fmt.Sprintf("%s(%s), ", stats.ServerProcessing.String(), "server processing"))
+	sb.WriteString(fmt.Sprintf("%s(%s), ", stats.ContentTransfer.String(), "content transfer"))
+	sb.WriteString(fmt.Sprintf("%s(%s)", stats.Total.String(), "total"))
+	return sb.String()
 }
 
 // Finish http trace finish
