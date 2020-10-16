@@ -3,8 +3,8 @@
 [![Build Status](https://img.shields.io/travis/vicanso/http-trace.svg?label=linux+build)](https://travis-ci.org/vicanso/http-trace)
 
 
-HTTP Request trace, timing and requset's informations. 
-Timing include `dns`, `connect`, `tls`, `first reponse byte` and so on.
+HTTP Request trace, timing and request's information. 
+Timing include `dns`, `connect`, `tls`, `first response byte` and so on.
 
 events:
 - GetConn
