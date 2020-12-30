@@ -1,6 +1,6 @@
 # http trace
 
-[![Build Status](https://img.shields.io/travis/vicanso/http-trace.svg?label=linux+build)](https://travis-ci.org/vicanso/http-trace)
+[![Build Status](https://github.com/vicanso/http-trace/workflows/Test/badge.svg)](https://github.com/vicanso/http-trace/actions)
 
 
 HTTP Request trace, timing and request's information. 
