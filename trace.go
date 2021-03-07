@@ -27,52 +27,86 @@ import (
 type (
 	// HTTPTimelineStats http timeline stats
 	HTTPTimelineStats struct {
-		DNSLookup        time.Duration `json:"dnsLookup,omitempty"`
-		GetConnection    time.Duration `json:"getConnection,omitempty"`
-		TCPConnection    time.Duration `json:"tcpConnection,omitempty"`
-		TLSHandshake     time.Duration `json:"tlsHandshake,omitempty"`
+		// dns lookup time
+		DNSLookup time.Duration `json:"dnsLookup,omitempty"`
+		// get connection time
+		GetConnection time.Duration `json:"getConnection,omitempty"`
+		// tcp connection time
+		TCPConnection time.Duration `json:"tcpConnection,omitempty"`
+		// tls handshake time
+		TLSHandshake time.Duration `json:"tlsHandshake,omitempty"`
+		// server processing time
 		ServerProcessing time.Duration `json:"serverProcessing,omitempty"`
-		ContentTransfer  time.Duration `json:"contentTransfer,omitempty"`
-		Total            time.Duration `json:"total,omitempty"`
+		// content transfer time
+		ContentTransfer time.Duration `json:"contentTransfer,omitempty"`
+		// total time
+		Total time.Duration `json:"total,omitempty"`
 	}
 
 	tlsCertificate struct {
-		DNSNames  []string  `json:"dnsNames,omitempty"`
+		// dns names of tls certificate
+		DNSNames []string `json:"dnsNames,omitempty"`
+		// certificate is valid not before
 		NotBefore time.Time `json:"notBefore,omitempty"`
-		NotAfter  time.Time `json:"notAfter,omitempty"`
+		// certificate is valid not after
+		NotAfter time.Time `json:"notAfter,omitempty"`
 	}
 
 	// HTTPTrace http trace
 	HTTPTrace struct {
-		// Host request host
-		Host           string           `json:"host,omitempty"`
-		Addrs          []string         `json:"addrs,omitempty"`
-		Network        string           `json:"network,omitempty"`
-		Addr           string           `json:"addr,omitempty"`
-		LocalAddr      string           `json:"localAddr,omitempty"`
-		Reused         bool             `json:"reused,omitempty"`
-		WasIdle        bool             `json:"wasIdle,omitempty"`
-		IdleTime       time.Duration    `json:"idleTime,omitempty"`
-		Protocol       string           `json:"protocol,omitempty"`
-		TLSVersion     string           `json:"tlsVersion,omitempty"`
-		TLSResume      bool             `json:"tlsResume,omitempty"`
-		TLSCipherSuite string           `json:"tlsCipherSuite,omitempty"`
-		Certificates   []tlsCertificate `json:"certificates,omitempty"`
+		// http request host
+		Host string `json:"host,omitempty"`
+		// addrs of host
+		Addrs []string `json:"addrs,omitempty"`
+		// network type
+		Network string `json:"network,omitempty"`
+		// http request addr
+		Addr string `json:"addr,omitempty"`
+		// http local addr
+		LocalAddr string `json:"localAddr,omitempty"`
+		// tcp reused
+		Reused bool `json:"reused,omitempty"`
+		// tcp was idle
+		WasIdle bool `json:"wasIdle,omitempty"`
+		// tcp idle time
+		IdleTime time.Duration `json:"idleTime,omitempty"`
+		// http protocol
+		Protocol string `json:"protocol,omitempty"`
+		// tls version
+		TLSVersion string `json:"tlsVersion,omitempty"`
+		// tls resume
+		TLSResume bool `json:"tlsResume,omitempty"`
+		// tls cipher suite
+		TLSCipherSuite string `json:"tlsCipherSuite,omitempty"`
+		// tls certificate lst
+		Certificates []tlsCertificate `json:"certificates,omitempty"`
 		// OCSPStapled OCSP stapling
 		OCSPStapled bool `json:"ocspStapled,omitempty"`
 
-		Start                time.Time `json:"start,omitempty"`
-		GetConn              time.Time `json:"getConn,omitempty"`
-		DNSStart             time.Time `json:"dnsStart,omitempty"`
-		DNSDone              time.Time `json:"dnsDone,omitempty"`
-		ConnectStart         time.Time `json:"connectStart,omitempty"`
-		ConnectDone          time.Time `json:"connectDone,omitempty"`
-		GotConnect           time.Time `json:"gotConnect,omitempty"`
-		WroteHeaders         time.Time `json:"wroteHeaders,omitempty"`
+		// start time of request
+		Start time.Time `json:"start,omitempty"`
+		// get connection time of request
+		GetConn time.Time `json:"getConn,omitempty"`
+		// dns start time
+		DNSStart time.Time `json:"dnsStart,omitempty"`
+		// dns done time
+		DNSDone time.Time `json:"dnsDone,omitempty"`
+		// connect start time
+		ConnectStart time.Time `json:"connectStart,omitempty"`
+		// connect done time
+		ConnectDone time.Time `json:"connectDone,omitempty"`
+		// got connect time
+		GotConnect time.Time `json:"gotConnect,omitempty"`
+		// wrote headers time
+		WroteHeaders time.Time `json:"wroteHeaders,omitempty"`
+		// got first response byte time
 		GotFirstResponseByte time.Time `json:"gotFirstResponseByte,omitempty"`
-		TLSHandshakeStart    time.Time `json:"tlsHandshakeStart,omitempty"`
-		TLSHandshakeDone     time.Time `json:"tlsHandshakeDone,omitempty"`
-		Done                 time.Time `json:"done,omitempty"`
+		// tls handshake start time
+		TLSHandshakeStart time.Time `json:"tlsHandshakeStart,omitempty"`
+		// tls handshake done time
+		TLSHandshakeDone time.Time `json:"tlsHandshakeDone,omitempty"`
+		// request done time
+		Done time.Time `json:"done,omitempty"`
 	}
 )
 
@@ -141,7 +175,7 @@ func convertCipherSuite(cipherSuite uint16) string {
 	return v
 }
 
-// String http timeline stats to string
+// String return http timeline stats's string
 func (stats *HTTPTimelineStats) String() string {
 	sb := strings.Builder{}
 	sb.WriteString(fmt.Sprintf("%s(%s), ", stats.DNSLookup.String(), "dns lookup"))
@@ -154,12 +188,12 @@ func (stats *HTTPTimelineStats) String() string {
 	return sb.String()
 }
 
-// Finish http trace finish
+// Finish http trace
 func (ht *HTTPTrace) Finish() {
 	ht.Done = time.Now()
 }
 
-// Stats get the stats of time line
+// Stats returns the stats of time line
 func (ht *HTTPTrace) Stats() (stats *HTTPTimelineStats) {
 	stats = &HTTPTimelineStats{}
 	if !ht.GetConn.IsZero() {
@@ -188,7 +222,7 @@ func (ht *HTTPTrace) Stats() (stats *HTTPTimelineStats) {
 	return
 }
 
-// NewClientTrace http client trace
+// NewClientTrace returns a new client trace
 func NewClientTrace() (trace *httptrace.ClientTrace, ht *HTTPTrace) {
 	ht = &HTTPTrace{
 		Start: time.Now(),
