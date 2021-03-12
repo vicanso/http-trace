@@ -160,6 +160,10 @@ func init() {
 }
 
 func convertTLSVersion(version uint16) string {
+	// 0 则返回-，未知
+	if version == 0 {
+		return "-"
+	}
 	v, ok := versions[version]
 	if !ok {
 		v = strconv.Itoa(int(version))
@@ -168,6 +172,10 @@ func convertTLSVersion(version uint16) string {
 }
 
 func convertCipherSuite(cipherSuite uint16) string {
+	// 0 则返回-，未知
+	if cipherSuite == 0 {
+		return "-"
+	}
 	v, ok := cipherSuites[cipherSuite]
 	if !ok {
 		v = strconv.Itoa(int(cipherSuite))
