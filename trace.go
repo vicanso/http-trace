@@ -248,10 +248,16 @@ func NewClientTrace() (trace *httptrace.ClientTrace, ht *HTTPTrace) {
 			ht.DNSDone = time.Now()
 		},
 		ConnectStart: func(_, _ string) {
-			ht.ConnectStart = time.Now()
+			// 在支持ipv6的网络有可能会调用多次
+			// 因此仅为0的时候才设置
+			if ht.ConnectStart.IsZero() {
+				ht.ConnectStart = time.Now()
+			}
 		},
 		ConnectDone: func(_, _ string, _ error) {
-			ht.ConnectDone = time.Now()
+			if ht.ConnectDone.IsZero() {
+				ht.ConnectDone = time.Now()
+			}
 		},
 		GetConn: func(_ string) {
 			ht.GetConn = time.Now()
