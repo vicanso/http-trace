@@ -48,6 +48,10 @@ func TestTrace(t *testing.T) {
 	trace.ConnectStart("tcp", "1.1.1.1")
 	time.Sleep(time.Millisecond)
 
+	trace.WroteHeaders()
+	trace.WroteRequest(nht.WroteRequestInfo{})
+	trace.WroteRequest(nht.WroteRequestInfo{})
+
 	trace.ConnectDone("", "", nil)
 	time.Sleep(time.Millisecond)
 

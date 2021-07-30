@@ -82,6 +82,8 @@ type (
 		Certificates []tlsCertificate `json:"certificates,omitempty"`
 		// OCSPStapled OCSP stapling
 		OCSPStapled bool `json:"ocspStapled,omitempty"`
+		// DNSCoalesced dns query coalesced
+		DNSCoalesced bool `json:"dnsCoalesced"`
 
 		// start time of request
 		Start time.Time `json:"start,omitempty"`
@@ -99,6 +101,8 @@ type (
 		GotConnect time.Time `json:"gotConnect,omitempty"`
 		// wrote headers time
 		WroteHeaders time.Time `json:"wroteHeaders,omitempty"`
+		// wrote request
+		WroteRequest time.Time `json:"wroteRequest,omitempty"`
 		// got first response byte time
 		GotFirstResponseByte time.Time `json:"gotFirstResponseByte,omitempty"`
 		// tls handshake start time
@@ -245,6 +249,7 @@ func NewClientTrace() (trace *httptrace.ClientTrace, ht *HTTPTrace) {
 			for index, addr := range info.Addrs {
 				ht.Addrs[index] = addr.String()
 			}
+			ht.DNSCoalesced = info.Coalesced
 			ht.DNSDone = time.Now()
 		},
 		ConnectStart: func(_, _ string) {
@@ -278,6 +283,12 @@ func NewClientTrace() (trace *httptrace.ClientTrace, ht *HTTPTrace) {
 		},
 		WroteHeaders: func() {
 			ht.WroteHeaders = time.Now()
+		},
+		WroteRequest: func(_ nht.WroteRequestInfo) {
+			// 如果设置了允许重试，则有可能多次触发
+			if ht.WroteRequest.IsZero() {
+				ht.WroteRequest = time.Now()
+			}
 		},
 		GotFirstResponseByte: func() {
 			ht.GotFirstResponseByte = time.Now()
