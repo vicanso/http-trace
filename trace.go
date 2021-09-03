@@ -272,6 +272,11 @@ func NewClientTrace() (trace *httptrace.ClientTrace, ht *HTTPTrace) {
 		GotConn: func(info nht.GotConnInfo) {
 			if info.Conn != nil {
 				ht.LocalAddr = info.Conn.LocalAddr().String()
+				if ht.Addr == "" {
+					remoteAddr := info.Conn.RemoteAddr()
+					ht.Network = remoteAddr.Network()
+					ht.Addr = remoteAddr.String()
+				}
 			}
 
 			ht.Reused = info.Reused
