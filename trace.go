@@ -259,7 +259,9 @@ func NewClientTrace() (trace *httptrace.ClientTrace, ht *HTTPTrace) {
 				ht.ConnectStart = time.Now()
 			}
 		},
-		ConnectDone: func(_, _ string, _ error) {
+		ConnectDone: func(network, addr string, _ error) {
+			ht.Network = network
+			ht.Addr = addr
 			if ht.ConnectDone.IsZero() {
 				ht.ConnectDone = time.Now()
 			}
@@ -269,9 +271,6 @@ func NewClientTrace() (trace *httptrace.ClientTrace, ht *HTTPTrace) {
 		},
 		GotConn: func(info nht.GotConnInfo) {
 			if info.Conn != nil {
-				remoteAddr := info.Conn.RemoteAddr()
-				ht.Network = remoteAddr.Network()
-				ht.Addr = remoteAddr.String()
 				ht.LocalAddr = info.Conn.LocalAddr().String()
 			}
 
