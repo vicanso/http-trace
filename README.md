@@ -7,6 +7,7 @@ HTTP Request trace, timing and request's information.
 Timing include `dns`, `connect`, `tls`, `first response byte` and so on.
 
 events:
+
 - GetConn
 - DNSStart
 - DNSDone

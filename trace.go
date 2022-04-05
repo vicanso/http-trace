@@ -190,8 +190,8 @@ func convertCipherSuite(cipherSuite uint16) string {
 // String return http timeline stats's string
 func (stats *HTTPTimelineStats) String() string {
 	sb := strings.Builder{}
-	sb.WriteString(fmt.Sprintf("%s(%s), ", stats.DNSLookup.String(), "dns lookup"))
 	sb.WriteString(fmt.Sprintf("%s(%s), ", stats.GetConnection.String(), "get connection"))
+	sb.WriteString(fmt.Sprintf("%s(%s), ", stats.DNSLookup.String(), "dns lookup"))
 	sb.WriteString(fmt.Sprintf("%s(%s), ", stats.TCPConnection.String(), "tcp connection"))
 	sb.WriteString(fmt.Sprintf("%s(%s), ", stats.TLSHandshake.String(), "tls handshake"))
 	sb.WriteString(fmt.Sprintf("%s(%s), ", stats.ServerProcessing.String(), "server processing"))
