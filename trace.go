@@ -18,7 +18,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http/httptrace"
-	nht "net/http/httptrace"
 	"strconv"
 	"strings"
 	"time"
@@ -240,11 +239,11 @@ func NewClientTrace() (trace *httptrace.ClientTrace, ht *HTTPTrace) {
 		Start: time.Now(),
 	}
 	trace = &httptrace.ClientTrace{
-		DNSStart: func(info nht.DNSStartInfo) {
+		DNSStart: func(info httptrace.DNSStartInfo) {
 			ht.Host = info.Host
 			ht.DNSStart = time.Now()
 		},
-		DNSDone: func(info nht.DNSDoneInfo) {
+		DNSDone: func(info httptrace.DNSDoneInfo) {
 			ht.Addrs = make([]string, len(info.Addrs))
 			for index, addr := range info.Addrs {
 				ht.Addrs[index] = addr.String()
@@ -269,7 +268,7 @@ func NewClientTrace() (trace *httptrace.ClientTrace, ht *HTTPTrace) {
 		GetConn: func(_ string) {
 			ht.GetConn = time.Now()
 		},
-		GotConn: func(info nht.GotConnInfo) {
+		GotConn: func(info httptrace.GotConnInfo) {
 			if info.Conn != nil {
 				ht.LocalAddr = info.Conn.LocalAddr().String()
 				remoteAddr := info.Conn.RemoteAddr()
@@ -286,7 +285,7 @@ func NewClientTrace() (trace *httptrace.ClientTrace, ht *HTTPTrace) {
 		WroteHeaders: func() {
 			ht.WroteHeaders = time.Now()
 		},
-		WroteRequest: func(_ nht.WroteRequestInfo) {
+		WroteRequest: func(_ httptrace.WroteRequestInfo) {
 			// 如果设置了允许重试，则有可能多次触发
 			if ht.WroteRequest.IsZero() {
 				ht.WroteRequest = time.Now()
