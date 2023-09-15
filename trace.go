@@ -34,6 +34,8 @@ type (
 		TCPConnection time.Duration `json:"tcpConnection,omitempty"`
 		// tls handshake time
 		TLSHandshake time.Duration `json:"tlsHandshake,omitempty"`
+		// request body send time
+		RequestSend time.Duration `json:"requestSend"`
 		// server processing time
 		ServerProcessing time.Duration `json:"serverProcessing,omitempty"`
 		// content transfer time
@@ -193,6 +195,7 @@ func (stats *HTTPTimelineStats) String() string {
 	sb.WriteString(fmt.Sprintf("%s(%s), ", stats.DNSLookup.String(), "dns lookup"))
 	sb.WriteString(fmt.Sprintf("%s(%s), ", stats.TCPConnection.String(), "tcp connection"))
 	sb.WriteString(fmt.Sprintf("%s(%s), ", stats.TLSHandshake.String(), "tls handshake"))
+	sb.WriteString(fmt.Sprintf("%s(%s), ", stats.RequestSend.String(), "request send"))
 	sb.WriteString(fmt.Sprintf("%s(%s), ", stats.ServerProcessing.String(), "server processing"))
 	sb.WriteString(fmt.Sprintf("%s(%s), ", stats.ContentTransfer.String(), "content transfer"))
 	sb.WriteString(fmt.Sprintf("%s(%s)", stats.Total.String(), "total"))
@@ -220,8 +223,12 @@ func (ht *HTTPTrace) Stats() (stats *HTTPTimelineStats) {
 		stats.TLSHandshake = ht.TLSHandshakeDone.Sub(ht.TLSHandshakeStart)
 	}
 
-	if !ht.GotConnect.IsZero() && !ht.GotFirstResponseByte.IsZero() {
-		stats.ServerProcessing = ht.GotFirstResponseByte.Sub(ht.GotConnect)
+	if !ht.WroteRequest.IsZero() && !ht.GotConnect.IsZero() {
+		stats.RequestSend = ht.WroteHeaders.Sub(ht.GotConnect)
+	}
+
+	if !ht.WroteRequest.IsZero() && !ht.GotFirstResponseByte.IsZero() {
+		stats.ServerProcessing = ht.GotFirstResponseByte.Sub(ht.WroteRequest)
 	}
 	if ht.Done.IsZero() {
 		ht.Done = time.Now()
