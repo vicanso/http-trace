@@ -40,6 +40,8 @@ type (
 		ServerProcessing time.Duration `json:"serverProcessing,omitempty"`
 		// content transfer time
 		ContentTransfer time.Duration `json:"contentTransfer,omitempty"`
+		// unmarshal time
+		Unmarshal time.Duration `json:"unmarshal,omitempty"`
 		// total time
 		Total time.Duration `json:"total,omitempty"`
 	}
@@ -110,6 +112,10 @@ type (
 		TLSHandshakeStart time.Time `json:"tlsHandshakeStart,omitempty"`
 		// tls handshake done time
 		TLSHandshakeDone time.Time `json:"tlsHandshakeDone,omitempty"`
+		// unmarshal start time
+		UnmarshalStart time.Time `json:"unmarshalStart,omitempty"`
+		// unmarshal done time
+		UnmarshalDone time.Time `json:"unmarshalDone,omitempty"`
 		// request done time
 		Done time.Time `json:"done,omitempty"`
 	}
@@ -235,6 +241,9 @@ func (ht *HTTPTrace) Stats() (stats *HTTPTimelineStats) {
 	}
 	if !ht.GotFirstResponseByte.IsZero() {
 		stats.ContentTransfer = ht.Done.Sub(ht.GotFirstResponseByte)
+	}
+	if !ht.UnmarshalDone.IsZero() {
+		stats.Unmarshal = ht.UnmarshalDone.Sub(ht.UnmarshalStart)
 	}
 	stats.Total = ht.Done.Sub(ht.Start)
 	return
